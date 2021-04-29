@@ -1,9 +1,23 @@
 import SwiftUI
+import Iori
 
 struct ContentView: View {
+    
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        VStack {
+            HStack {
+                Button("Start") {
+                    if !AyameServer.shared.isRunning {
+                        AyameServer.shared.start(configuration:  AppManager.shared.configuration)
+                    }
+                }
+                Button("Stop") {
+                    if AyameServer.shared.isRunning {
+                        AyameServer.shared.stop()
+                    }
+                }
+            }
+        }
     }
 }
 

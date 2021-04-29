@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,12 @@
 		91C587E4263AE2650096C9CC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91C587CF263AE2640096C9CC /* ContentView.swift */; };
 		91C587E5263AE2650096C9CC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 91C587D0263AE2650096C9CC /* Assets.xcassets */; };
 		91C587E6263AE2650096C9CC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 91C587D0263AE2650096C9CC /* Assets.xcassets */; };
+		91C587F1263AE41E0096C9CC /* Iori in Frameworks */ = {isa = PBXBuildFile; productRef = 91C587F0263AE41E0096C9CC /* Iori */; };
+		91C587F4263AE42C0096C9CC /* Iori in Frameworks */ = {isa = PBXBuildFile; productRef = 91C587F3263AE42C0096C9CC /* Iori */; };
+		91C587F6263AE4610096C9CC /* AppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91C587F5263AE4610096C9CC /* AppManager.swift */; };
+		91C587F7263AE4610096C9CC /* AppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91C587F5263AE4610096C9CC /* AppManager.swift */; };
+		91C587F9263AE4C10096C9CC /* ayame.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 91C587F8263AE4C10096C9CC /* ayame.yaml */; };
+		91C587FA263AE4C10096C9CC /* ayame.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 91C587F8263AE4C10096C9CC /* ayame.yaml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +30,8 @@
 		91C587DD263AE2650096C9CC /* IoriServerSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IoriServerSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		91C587DF263AE2650096C9CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		91C587E0263AE2650096C9CC /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
+		91C587F5263AE4610096C9CC /* AppManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppManager.swift; sourceTree = "<group>"; };
+		91C587F8263AE4C10096C9CC /* ayame.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.yaml; path = ayame.yaml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91C587F1263AE41E0096C9CC /* Iori in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91C587F4263AE42C0096C9CC /* Iori in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,15 +61,18 @@
 				91C587D7263AE2650096C9CC /* iOS */,
 				91C587DE263AE2650096C9CC /* macOS */,
 				91C587D6263AE2650096C9CC /* Products */,
+				91C587F2263AE42C0096C9CC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		91C587CD263AE2640096C9CC /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				91C587CE263AE2640096C9CC /* IoriServerSampleApp.swift */,
+				91C587F5263AE4610096C9CC /* AppManager.swift */,
 				91C587CF263AE2640096C9CC /* ContentView.swift */,
+				91C587CE263AE2640096C9CC /* IoriServerSampleApp.swift */,
 				91C587D0263AE2650096C9CC /* Assets.xcassets */,
+				91C587F8263AE4C10096C9CC /* ayame.yaml */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -90,6 +103,13 @@
 			path = macOS;
 			sourceTree = "<group>";
 		};
+		91C587F2263AE42C0096C9CC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -106,6 +126,9 @@
 			dependencies = (
 			);
 			name = "IoriServerSample (iOS)";
+			packageProductDependencies = (
+				91C587F0263AE41E0096C9CC /* Iori */,
+			);
 			productName = "IoriServerSample (iOS)";
 			productReference = 91C587D5263AE2650096C9CC /* IoriServerSample.app */;
 			productType = "com.apple.product-type.application";
@@ -123,6 +146,9 @@
 			dependencies = (
 			);
 			name = "IoriServerSample (macOS)";
+			packageProductDependencies = (
+				91C587F3263AE42C0096C9CC /* Iori */,
+			);
 			productName = "IoriServerSample (macOS)";
 			productReference = 91C587DD263AE2650096C9CC /* IoriServerSample.app */;
 			productType = "com.apple.product-type.application";
@@ -153,6 +179,9 @@
 				Base,
 			);
 			mainGroup = 91C587C8263AE2640096C9CC;
+			packageReferences = (
+				91C587EF263AE41E0096C9CC /* XCRemoteSwiftPackageReference "iori-swift" */,
+			);
 			productRefGroup = 91C587D6263AE2650096C9CC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -168,6 +197,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91C587F9263AE4C10096C9CC /* ayame.yaml in Resources */,
 				91C587E5263AE2650096C9CC /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -176,6 +206,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91C587FA263AE4C10096C9CC /* ayame.yaml in Resources */,
 				91C587E6263AE2650096C9CC /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -187,6 +218,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91C587F6263AE4610096C9CC /* AppManager.swift in Sources */,
 				91C587E3263AE2650096C9CC /* ContentView.swift in Sources */,
 				91C587E1263AE2650096C9CC /* IoriServerSampleApp.swift in Sources */,
 			);
@@ -196,6 +228,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91C587F7263AE4610096C9CC /* AppManager.swift in Sources */,
 				91C587E4263AE2650096C9CC /* ContentView.swift in Sources */,
 				91C587E2263AE2650096C9CC /* IoriServerSampleApp.swift in Sources */,
 			);
@@ -439,6 +472,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		91C587EF263AE41E0096C9CC /* XCRemoteSwiftPackageReference "iori-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/szktty/iori-swift.git";
+			requirement = {
+				branch = develop;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		91C587F0263AE41E0096C9CC /* Iori */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 91C587EF263AE41E0096C9CC /* XCRemoteSwiftPackageReference "iori-swift" */;
+			productName = Iori;
+		};
+		91C587F3263AE42C0096C9CC /* Iori */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 91C587EF263AE41E0096C9CC /* XCRemoteSwiftPackageReference "iori-swift" */;
+			productName = Iori;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 91C587C9263AE2640096C9CC /* Project object */;
 }
