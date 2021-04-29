@@ -1,0 +1,14 @@
+clean: true
+author: SUZUKI Tetsuya
+author_url: https://github.com/szktty/
+github_url: https://github.com/szktty/iori-swift/
+github_file_prefix: https://github.com/szktty/iori-swift/blob/master
+root_url: https://github.com/szktty/iori-swift/
+theme: apple
+min_acl: public
+sdk: iphone|macosx
+module: Iori
+module_version: 2021.1.0
+swift_version: 5.4
+swift_build_tool: spm
+
