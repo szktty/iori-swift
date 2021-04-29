@@ -9,7 +9,6 @@ let package = Package(
         .macOS(.v10_12), .iOS(.v10),
     ],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .executable(
             name: "iori",
             targets: ["tool"]),
