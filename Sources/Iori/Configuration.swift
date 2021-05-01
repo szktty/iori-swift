@@ -102,7 +102,7 @@ public class Configuration {
          }
         
         loadURL(yaml, for: "authn_webhook_url") {
-            config.disconnectWebHookURL = $0
+            config.authnWebHookURL = $0
         }
         
         loadURL(yaml, for: "disconnect_webhook_url") {
