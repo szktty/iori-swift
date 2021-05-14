@@ -182,31 +182,12 @@ public class AyameServer {
     private func _handle(_ text: String, in wsSession: WebSocketSession) {
         Log.iori.debug("received message")
         
-        guard let data = text.data(using: .utf8) else {
+        guard let message = Message.from(text) else {
             Log.ayame.error("UnexpectedJSON rawMessage=\(text)")
             return
         }
         
-        let decoder = JSONDecoder()
-        do {
-            var message = try decoder.decode(Message.self, from: data)
-            
-            let json = try JSONSerialization.jsonObject(with: data, options: [])
-            if let json = json as? [String: Any] {
-                if let value = json["authnMetadata"] {
-                    message.authnMetadata = JSON(value: value)
-                }
-                if let value = json["authzMetadata"] {
-                    message.authzMetadata = JSON(value: value)
-                }
-            }
-            
-            self._handle(message, rawMessage: text, in: wsSession)
-        } catch let error {
-            Log.iori.debug("failed to decode JSON => \(text), \(error)")
-            Log.ayame.error("UnexpectedJSON rawMessage=\(text)")
-            return
-        }
+        _handle(message, rawMessage: text, in: wsSession)
     }
     
     private func _handle(_ message: Message, rawMessage: String, in wsSession: WebSocketSession) {
@@ -224,28 +205,20 @@ public class AyameServer {
     }
     
     func send(_ message: Message, in webSocket: WebSocketSession, completionHandler: ((Error?) -> Void)? = nil) {
-        let encoder = JSONEncoder()
-        do {
-            let data = try encoder.encode(message)
-            guard let text = String(data: data, encoding: .utf8) else {
-                let error = IoriError.invalidJSON
-                Log.ayame.error("InvalidJSON")
-                completionHandler?(error)
-                return
-            }
-            Log.iori.debug("send message => \(text)")
-            
-            webSocket.writeText(text) { error in
-                if error != nil {
-                    Log.ayame.error("FailedWriteMessage error: \(error!)")
-                }
-                Log.signaling.debug("\(message) rawMessage: \(text)")
-                completionHandler?(nil)
-            }
-        } catch let error {
-            Log.iori.debug("failed to encode message => \(message), \(error)")
+        guard let text = message.jsonText() else {
+            let error = IoriError.invalidJSON
             Log.ayame.error("FailedToSendMsg msg=\(message) error: \(error)")
             completionHandler?(error)
+            return
+        }
+        
+        Log.iori.debug("send message => \(text)")
+        webSocket.writeText(text) { error in
+            if error != nil {
+                Log.ayame.error("FailedWriteMessage error: \(error!)")
+            }
+            Log.signaling.debug("\(message) rawMessage: \(text)")
+            completionHandler?(nil)
         }
     }
     

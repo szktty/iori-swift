@@ -212,29 +212,7 @@ class Connection {
     }
     
     func send(_ message: Message, completionHandler: ((Error?) -> Void)? = nil) {
-        let encoder = JSONEncoder()
-        do {
-            let data = try encoder.encode(message)
-            guard let text = String(data: data, encoding: .utf8) else {
-                let error = IoriError.invalidJSON
-                self.errorLog("InvalidJSON", error: error, at: (#file, #line))
-                completionHandler?(error)
-                return
-            }
-            Log.iori.debug("send message => \(text)")
-            
-            webSocket.writeText(text) { error in
-                if error != nil {
-                    self.errorLog("FailedWriteMessage", error: error)
-                }
-                self.signalingLog(message, rawMessage: text)
-                completionHandler?(nil)
-            }
-        } catch let error {
-            Log.iori.debug("failed to encode message => \(message), \(error)")
-            errorLog("FailedToSendMsg msg=\(message)", error: error)
-            completionHandler?(error)
-        }
+        server.send(message, in: webSocket, completionHandler: completionHandler)
     }
     
     // TODO: authzMetadata

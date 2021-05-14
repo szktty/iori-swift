@@ -36,6 +36,51 @@ struct Message: Codable {
         self.type = type
     }
     
+    static func from(_ text: String) -> Message? {
+        let reason = "UnexpectedJSON rawMessage=\(text)"
+        guard let data = text.data(using: .utf8) else {
+            Log.ayame.error(reason)
+            return nil
+        }
+        
+        let decoder = JSONDecoder()
+        do {
+            var message = try decoder.decode(Message.self, from: data)
+            
+            let json = try JSONSerialization.jsonObject(with: data, options: [])
+            if let json = json as? [String: Any] {
+                if let rawValue = json["authnMetadata"] {
+                    if let value = rawValue as? Encodable {
+                        message.authnMetadata = JSON(value)
+                    } else {
+                        // 解析できた JSON は当然 Encodable なのでここには来ないはず
+                        Log.ayame.error(reason)
+                    }
+                }
+            }
+            return message
+        } catch let error {
+            Log.iori.debug("failed to decode JSON => \(text), \(error)")
+            Log.ayame.error(reason)
+            return nil
+        }
+    }
+    
+    func jsonText() -> String? {
+        let encoder = JSONEncoder()
+        do {
+            let data = try encoder.encode(self)
+            guard let text = String(data: data, encoding: .utf8) else {
+                Log.ayame.error("InvalidJSON")
+                return nil
+            }
+            return text
+        } catch let error {
+            Log.iori.debug("failed to encode message => \(self), \(error)")
+            return nil
+        }
+    }
+    
     enum Builder {
         
         static func register(roomId: String, clientId: String,
