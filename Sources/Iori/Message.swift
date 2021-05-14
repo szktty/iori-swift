@@ -139,23 +139,16 @@ struct Message: Codable {
 
 struct JSON: Codable {
     
-    private var encodable: Encodable?
+    var value: Encodable?
     
-    var value: Any?
-    
-    init(value: Any) {
+    init(_ value: Encodable) {
         self.value = value
     }
     
     init(from decoder: Decoder) throws {}
     
     func encode(to encoder: Encoder) throws {
-        try encodable?.encode(to: encoder)
+        try value?.encode(to: encoder)
     }
-    
-    mutating func setEncodableValue(_ value: Encodable) {
-        self.encodable = value
-        self.value = value
-    }
-    
+
 }
