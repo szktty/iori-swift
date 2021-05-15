@@ -151,4 +151,53 @@ struct JSON: Codable {
         try value?.encode(to: encoder)
     }
 
+    static func decode<T: Decodable>(_ text: String,
+                                   to type: T.Type,
+                                   metadataHandler: ([String] , (T, String, JSON) -> Void)? = nil) -> T? {
+        let reason = "UnexpectedJSON rawMessage=\(text)"
+        guard let data = text.data(using: .utf8) else {
+            Log.ayame.error(reason)
+            return nil
+        }
+        
+        let decoder = JSONDecoder()
+        do {
+            let message = try decoder.decode(type, from: data)
+            
+            if let (keys, handler) = metadataHandler {
+                let json = try JSONSerialization.jsonObject(with: data, options: [])
+                if let json = json as? [String: Any] {
+                    for key in keys {
+                        if let rawValue = json[key] {
+                            if let value = rawValue as? Encodable {
+                                handler(message, key, JSON(value))
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return message
+        } catch let error {
+            Log.iori.debug("failed to decode JSON => \(text), \(error)")
+            Log.ayame.error(reason)
+            return nil
+        }
+    }
+    
+    func encode<T: Encodable>(_ message: T) -> String? {
+        let encoder = JSONEncoder()
+        do {
+            let data = try encoder.encode(self)
+            guard let text = String(data: data, encoding: .utf8) else {
+                Log.ayame.error("InvalidJSON")
+                return nil
+            }
+            return text
+        } catch let error {
+            Log.iori.debug("failed to encode message => \(self), \(error)")
+            return nil
+        }
+    }
+    
 }
