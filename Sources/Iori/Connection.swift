@@ -123,7 +123,15 @@ class Connection {
         }
 
         let request = Webhook.Request.disconnect(roomId: room.roomId, clientId: clientId, connectionId: connectionId.string)
-        Webhook.postRequest(request, to: url) { data, response, error in
+        Webhook.postRequest(request, to: url,
+                            httpResponseHandler: { _, response, log in
+                                guard response.statusCode == 200 else {
+                                    self.webhookErrorLog("DisconnectWebhookUnexpectedStatusCode", value: ("resp", log), at: (#file, #line))
+                                    completionHandler(IoriError.disconnectWebhookUnexpectedStatusCode)
+                                    return false
+                                }
+                                return true
+                            }) { response, error in
             guard error == nil else {
                 self.webhookErrorLog("DiconnectWebhookError", error: error!, at: (#file, #line))
                 completionHandler(error)
@@ -131,29 +139,6 @@ class Connection {
             }
             
             self.webhookLog(("disconnectReq", request))
-            
-            guard let response = response else {
-                self.webhookErrorLog("DiconnectWebhookResponseError", error: error!, at: (#file, #line))
-                completionHandler(error)
-                return
-            }
-            
-            var log: [String: Any] = [
-                "status": response.statusCode,
-                "header": response.allHeaderFields as? [String: Any] ?? [],
-                "body": ""]
-            if let data = data {
-                if let s = String(data: data, encoding: .utf8) {
-                    log["body"] = s
-                }
-            }
-
-            guard response.statusCode == 200 else {
-                self.webhookErrorLog("DisconnectWebhookUnexpectedStatusCode", value: ("resp", log), at: (#file, #line))
-                completionHandler(IoriError.authnWebhookUnexpectedStatusCode)
-                return
-            }
-            
             completionHandler(nil)
         }
     }

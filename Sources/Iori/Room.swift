@@ -19,6 +19,10 @@ class Room {
     
     var connections: [Connection] = []
     
+    var isRegistered: Bool {
+        AyameServer.shared.room(for: roomId) != nil
+    }
+    
     var hasSpace: Bool {
         connections.count < 2
     }

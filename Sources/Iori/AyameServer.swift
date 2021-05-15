@@ -229,28 +229,101 @@ public class AyameServer {
             return
         }
         
-        if let room = self.room(for: roomId) {
-            registerTwo(message, to: room, in: wsSession)
+        let room = self.room(for: roomId) ?? Room(roomId: roomId)
+        let connection = Connection(webSocket: wsSession, room: room, clientId: message.clientId)
+        
+        if Configuration.shared.authnWebHookURL != nil {
+            postAuthnRequest(message, for: connection) { response, error in
+                print("# post authn response")
+                guard error == nil else {
+                    connection.webhookErrorLog("AuthnWebhookError", error: error, at: (#file, #line))
+                    connection.sendReject(reason: "InternalServerError")
+                    return
+                }
+                guard let response = response else {
+                    connection.webhookErrorLog("AuthnWebhookError", error: error, at: (#file, #line))
+                    connection.sendReject(reason: "InternalServerError")
+                    return
+                }
+                guard response.allowed == true else {
+                    if let reason = response.reason {
+                        connection.sendReject(reason: reason)
+                    } else {
+                        connection.webhookErrorLog("AuthnWebhookResponseError", error: error, at: (#file, #line))
+                        connection.sendReject(reason: "InternalServerError")
+                    }
+                    return
+                }
+                
+                // TODO: iceServers, authzMetadata
+                
+                self.register(message, connection: connection, to: room, in: wsSession)
+            }
         } else {
-            registerOne(message, to: roomId, in: wsSession)
+            register(message, connection: connection, to: room, in: wsSession)
         }
-        updateStatistics()
     }
     
+    private func postAuthnRequest(_ message: Message,
+                                  for connection: Connection,
+                                  completionHandler: @escaping (Webhook.Response?, Error?) -> Void) {
+        //print("# try postAuthnRequest to \(url.absoluteString)")
+        let request = Webhook.Request.authn(roomId: message.roomId!,
+                                            clientId: connection.clientId,
+                                            signalingKey: message.signalingKey,
+                                            authnMetadata: message.authnMetadata,
+                                            ayameClient: message.ayameClient,
+                                            libwebrtc: message.libwebrtc,
+                                            environment: message.environment)
+        let config = Configuration.shared
+        Webhook.postRequest(request,
+                            to: config.authnWebHookURL!,
+                            httpResponseHandler: { _, response, log in
+                                guard response.statusCode == 200 else {
+                                    let error = IoriError.authnWebhookUnexpectedStatusCode
+                                    connection.webhookErrorLog(error.description, value: ("resp", log), at: (#file, #line))
+                                    completionHandler(nil, error)
+                                    return false
+                                }
+                                return true
+                            }
+                            ) { response, error in
+            guard error == nil else {
+                print("# error => \(error)")
+                completionHandler(nil, error)
+                return
+            }
+
+            completionHandler(response, nil)
+        }
+    }
+
     private func addConnection(_ connection: Connection, to room: Room) {
         _connections[connection.webSocket.hashValue] = connection
         room.add(connection)
     }
     
-    private func registerOne(_ message: Message, to roomId: String, in wsSession: WebSocketSession) {
-        let room = Room(roomId: roomId)
+    private func register(_ message: Message,
+                          connection: Connection,
+                          to room: Room,
+                          in wsSession: WebSocketSession) {
+        if room.isRegistered {
+            registerTwo(message, connection: connection, to: room, in: wsSession)
+        } else {
+            registerOne(message, connection: connection, to: room, in: wsSession)
+        }
+        updateStatistics()
+    }
+
+    private func registerOne(_ message: Message,
+                             connection: Connection,
+                             to room: Room,
+                             in wsSession: WebSocketSession) {
         addRoom(room)
-        
-        let connection = Connection(webSocket: wsSession, room: room, clientId: message.clientId)
         addConnection(connection, to: room)
         room.state = .registerOne
         
-        Log.iori.info("room \(roomId): create new room")
+        Log.iori.info("room \(room.roomId): create new room")
         connection.debugLog("CREATED-ROOM")
         
         connection.debugLog("REGISTERED-ONE")
@@ -259,9 +332,10 @@ public class AyameServer {
         room.state = .waitRegisterTwo
     }
     
-    private func registerTwo(_ message: Message, to room: Room, in wsSession: WebSocketSession) {
-        let connection = Connection(webSocket: wsSession, room: room, clientId: message.clientId)
-        
+    private func registerTwo(_ message: Message,
+                             connection: Connection,
+                             to room: Room,
+                             in wsSession: WebSocketSession) {
         guard room.hasSpace else {
             Log.iori.info("room \(room.roomId): no space")
             connection.errorLog("RoomFilled")
